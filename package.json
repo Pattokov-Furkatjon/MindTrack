@@ -2,7 +2,7 @@
   "name": "ai",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/Pattokov-Furkatjon/MindTrack",
+  "homepage": "https://Pattokov-Furkatjon.github.io/MindTrack",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -18,7 +18,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "nodemon server.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
