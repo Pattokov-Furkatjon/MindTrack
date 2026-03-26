@@ -2,7 +2,7 @@
   "name": "ai",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://YOUR_USERNAME.github.io/MindTrack",
+  "homepage": "https://github.com/Pattokov-Furkatjon/MindTrack",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
