@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MindTrack</title>
+    <script type="text/javascript">
+      // Store the path for client-side routing and redirect to index.html
+      var l = window.location;
+      sessionStorage.redirect = l.pathname + l.search + l.hash;
+      // Redirect to index.html (GitHub Pages will serve it for any path)
+      if (l.hostname !== "localhost" && l.hostname !== "127.0.0.1") {
+        l.href = l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") + "/MindTrack/";
+      } else {
+        l.href = l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") + "/";
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

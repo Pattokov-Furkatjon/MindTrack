@@ -1,0 +1,261 @@
+/* Session Tracker Styles - Professional & Modern */
+
+.session-tracker {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.session-tracker.dark-mode {
+  background: linear-gradient(135deg, #1a2332 0%, #213047 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.tracker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Start Session UI */
+.tracker-start,
+.tracker-active {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tracker-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0a2138;
+  text-align: center;
+}
+
+.session-tracker.dark-mode .tracker-title {
+  color: #ffffff;
+}
+
+/* Session Type Selector */
+.session-type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.type-button {
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #0a2138;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.session-tracker.dark-mode .type-button {
+  background-color: #2a3f5f;
+  border-color: #3a5a7f;
+  color: #e0e0e0;
+}
+
+.type-button:hover {
+  border-color: #4caf50;
+  background-color: #f0fff4;
+  transform: translateY(-2px);
+}
+
+.session-tracker.dark-mode .type-button:hover {
+  background-color: #3a5a7f;
+  border-color: #66bb6a;
+}
+
+.type-button.active {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.session-tracker.dark-mode .type-button.active {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  border-color: #66bb6a;
+}
+
+/* Buttons */
+.btn-start,
+.btn-end {
+  padding: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-start {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+.btn-start:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(76, 175, 80, 0.4);
+}
+
+.btn-start:active {
+  transform: translateY(-1px);
+}
+
+.btn-end {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+}
+
+.btn-end:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(255, 107, 107, 0.4);
+}
+
+.btn-end:active {
+  transform: translateY(-1px);
+}
+
+/* Timer Display */
+.timer-display {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%);
+  border-radius: 12px;
+  border: 2px solid #e0e0ff;
+}
+
+.session-tracker.dark-mode .timer-display {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.timer-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #4caf50;
+  font-family: "Courier New", monospace;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.session-tracker.dark-mode .timer-value {
+  color: #81c784;
+}
+
+.timer-started {
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.session-tracker.dark-mode .timer-started {
+  color: #b0b0b0;
+}
+
+/* Session Info */
+.session-info {
+  background-color: rgba(76, 175, 80, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #4caf50;
+}
+
+.session-tracker.dark-mode .session-info {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.session-tracker.dark-mode .info-label {
+  color: #b0b0b0;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #0a2138;
+  font-weight: 700;
+}
+
+.session-tracker.dark-mode .info-value {
+  color: #ffffff;
+}
+
+/* Tracker Hint */
+.tracker-hint {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #999;
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+}
+
+.session-tracker.dark-mode .tracker-hint {
+  color: #a0a0a0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .session-tracker {
+    padding: 1.5rem;
+    margin: 1.5rem 1rem;
+  }
+
+  .session-type-selector {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .type-button {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .tracker-title {
+    font-size: 1.2rem;
+  }
+
+  .timer-value {
+    font-size: 2.5rem;
+  }
+
+  .btn-start,
+  .btn-end {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
