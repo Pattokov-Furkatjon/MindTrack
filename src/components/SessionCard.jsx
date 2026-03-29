@@ -1,9 +1,10 @@
-import React from "react";
+import React, { memo } from "react";
 import "../styles/session-card.css";
 
 /**
  * SessionCard Component
  * Displays individual session with details
+ * Memoized to prevent unnecessary re-renders
  */
 function SessionCard({ session, isDarkMode, onDelete }) {
   const getSessionIcon = () => {
@@ -77,6 +78,16 @@ function SessionCard({ session, isDarkMode, onDelete }) {
             <span className="detail-icon">🕑</span>
             <span className="detail-text">End: {session.endTime}</span>
           </div>
+          <div className="detail-item">
+            <span className="detail-icon">😊</span>
+            <span className="detail-text">Mood: {session.mood || 0}/10</span>
+          </div>
+          {session.notes && (
+            <div className="detail-item">
+              <span className="detail-icon">📝</span>
+              <span className="detail-text">{session.notes}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -96,4 +107,5 @@ function SessionCard({ session, isDarkMode, onDelete }) {
   );
 }
 
-export default SessionCard;
+// Memoize to prevent unnecessary re-renders
+export default memo(SessionCard);

@@ -1,30 +1,62 @@
-import React from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { getEntriesByDate } from "../utils/logic";
 import "../styles/history.css";
 
 /**
- * Enhanced History Component
- * Displays previous entries with categories, sessions, and all new metrics
+ * Enhanced History Component with Pagination
+ * Displays previous entries with categories, sessions, and pagination for performance
  */
 function History({ entries, isDarkMode, onDeleteEntry }) {
-  // Group entries by date
-  const entriesByDate = getEntriesByDate(entries);
-  const sortedDates = Object.keys(entriesByDate).sort((a, b) => {
-    return new Date(b) - new Date(a);
-  });
+  // Pagination state - show 30 sessions per page
+  const ITEMS_PER_PAGE = 30;
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const formatDate = (dateString) => {
+  // Group entries by date
+  const entriesByDate = useMemo(() => getEntriesByDate(entries), [entries]);
+  
+  const sortedDates = useMemo(
+    () => Object.keys(entriesByDate).sort((a, b) => new Date(b) - new Date(a)),
+    [entriesByDate]
+  );
+
+  // Flatten and paginate all entries for efficient rendering
+  const allEntries = useMemo(() => {
+    const flattened = [];
+    sortedDates.forEach((date) => {
+      entriesByDate[date].forEach((entry) => {
+        flattened.push({ ...entry, date });
+      });
+    });
+    return flattened;
+  }, [sortedDates, entriesByDate]);
+
+  const totalPages = Math.ceil(allEntries.length / ITEMS_PER_PAGE);
+  const paginatedEntries = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return allEntries.slice(start, start + ITEMS_PER_PAGE);
+  }, [allEntries, currentPage, ITEMS_PER_PAGE]);
+
+  // Group paginated entries by date for display
+  const paginatedEntriesByDate = useMemo(() => {
+    return paginatedEntries.reduce((acc, entry) => {
+      if (!acc[entry.date]) acc[entry.date] = [];
+      acc[entry.date].push(entry);
+      return acc;
+    }, {});
+  }, [paginatedEntries]);
+
+  const formatDate = useCallback((dateString) => {
     const date = new Date(dateString + "T00:00:00");
     const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
-  };
+  }, []);
 
-  const isToday = (dateString) => {
+  const isToday = useCallback((dateString) => {
     const today = new Date().toISOString().split("T")[0];
     return dateString === today;
-  };
+  }, []);
 
-  const getCategoryColor = (category) => {
+  const getCategoryColor = useCallback((category) => {
     const colors = {
       Study: "#4caf50",
       Work: "#2196f3",
@@ -33,7 +65,15 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
       Other: "#9e9e9e",
     };
     return colors[category] || "#9e9e9e";
-  };
+  }, []);
+
+  const handlePageChange = useCallback((newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      // Scroll to top for better UX
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [totalPages]);
 
   if (entries.length === 0) {
     return (
@@ -50,9 +90,19 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
   return (
     <div className={`history-container ${isDarkMode ? "history-dark" : ""}`}>
       <h2 className="history-title">📜 Entry History</h2>
+      
+      {/* Pagination Info */}
+      {totalPages > 1 && (
+        <div className="pagination-info" aria-live="polite" aria-atomic="true">
+          Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
+          {Math.min(currentPage * ITEMS_PER_PAGE, allEntries.length)} of {allEntries.length} entries
+          (Page {currentPage} of {totalPages})
+        </div>
+      )}
+
       <div className="history-list">
-        {sortedDates.map((date) => {
-          const dayEntries = entriesByDate[date];
+        {Object.keys(paginatedEntriesByDate).sort((a, b) => new Date(b) - new Date(a)).map((date) => {
+          const dayEntries = paginatedEntriesByDate[date];
           return (
             <div key={date} className="history-day-group">
               {/* Day Header with Session Count */}
@@ -68,10 +118,18 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
                 {/* Day Summary Stats */}
                 <div className="day-summary">
                   <span className="summary-stat">
-                    ⏱️ {dayEntries.reduce((sum, e) => sum + (e.totalTime || e.study || 0), 0).toFixed(1)}h
+                    ⏱️{" "}
+                    {dayEntries
+                      .reduce((sum, e) => sum + (e.totalTime || e.study || 0), 0)
+                      .toFixed(1)}
+                    h
                   </span>
                   <span className="summary-stat">
-                    🎯 Avg {Math.round(dayEntries.reduce((sum, e) => sum + (e.focusLevel || 0), 0) / dayEntries.length)}/10
+                    🎯 Avg{" "}
+                    {Math.round(
+                      dayEntries.reduce((sum, e) => sum + (e.focusLevel || 0), 0) / dayEntries.length
+                    )}
+                    /10
                   </span>
                 </div>
               </div>
@@ -79,7 +137,11 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
               {/* Sessions for This Day */}
               <ul className="sessions-list">
                 {dayEntries.map((entry, idx) => (
-                  <li key={entry.sessionId || `${date}-${idx}`} className="history-card session-card">
+                  <li
+                    key={entry.sessionId || `${date}-${idx}`}
+                    className="history-card session-card"
+                    role="article"
+                  >
                     {/* Session Number and Category Badge */}
                     <div className="session-header">
                       <span className="session-number">Session {idx + 1}</span>
@@ -90,6 +152,7 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
                             backgroundColor: getCategoryColor(entry.category),
                             color: "#ffffff",
                           }}
+                          role="status"
                         >
                           🏷️ {entry.category}
                         </span>
@@ -153,8 +216,9 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
 
                     <button
                       className="card-delete-btn"
-                      onClick={() => onDeleteEntry(entry.sessionId)}
+                      onClick={() => onDeleteEntry(entry.id)}
                       title="Delete this session"
+                      aria-label={`Delete session from ${formatDate(date)}`}
                     >
                       🗑️ Delete
                     </button>
@@ -165,6 +229,43 @@ function History({ entries, isDarkMode, onDeleteEntry }) {
           );
         })}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination-controls" role="navigation" aria-label="History pagination">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+            aria-label="Previous page"
+          >
+            ← Previous
+          </button>
+
+          <div className="pagination-dots">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`pagination-dot ${currentPage === page ? "active" : ""}`}
+                aria-label={`Go to page ${page}`}
+                aria-current={currentPage === page ? "page" : undefined}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+            aria-label="Next page"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

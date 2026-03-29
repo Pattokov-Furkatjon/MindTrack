@@ -11,7 +11,7 @@ import "../styles/summary-panel.css";
  * SummaryPanel Component
  * Displays daily and weekly statistics
  */
-function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
+function SummaryPanel({ todayEntry, allEntries, isDarkMode, t }) {
   // Calculate today's totals
   const todayTotals = todayEntry
     ? calculateSessionTotals(todayEntry.sessions)
@@ -35,6 +35,14 @@ function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
   // Calculate weekly stats
   const weeklyStats = calculateWeeklyStats(allEntries);
 
+  const todayMood = todayEntry?.sessions?.length
+    ? Math.round(
+        (todayEntry.sessions.reduce((acc, s) => acc + (Number(s.mood) || 0), 0) /
+          todayEntry.sessions.length) *
+          10
+      ) / 10
+    : 0;
+
   const getScoreColor = (score) => {
     if (score >= 80) return "#4caf50"; // green
     if (score >= 60) return "#ffb74d"; // orange
@@ -56,7 +64,7 @@ function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
     <div className={`summary-panel ${isDarkMode ? "dark-mode" : ""}`}>
       {/* Today's Summary */}
       <div className="summary-section today-summary">
-        <h3 className="section-title">📊 Today's Summary</h3>
+        <h3 className="section-title">📊 {t ? t("todaySummary") : "Today's Summary"}</h3>
 
         <div className="stats-grid">
           {/* Study Time */}
@@ -80,6 +88,13 @@ function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
             <div className="stat-label">Exercise</div>
           </div>
 
+          {/* Mood Score */}
+          <div className="stat-card">
+            <div className="stat-icon">😊</div>
+            <div className="stat-value">{todayMood || "—"}/10</div>
+            <div className="stat-label">Mood</div>
+          </div>
+
           {/* Total Time */}
           <div className="stat-card highlight">
             <div className="stat-icon">⏱️</div>
@@ -99,7 +114,7 @@ function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
 
       {/* Productivity Score */}
       <div className="summary-section score-section">
-        <h3 className="section-title">⚖️ Productivity Score</h3>
+        <h3 className="section-title">⚖️ {t ? t("productivityScore") : "Productivity Score"}</h3>
 
         <div className="score-display">
           <div className="score-circle" style={{ borderColor: getScoreColor(todayScore) }}>
@@ -127,7 +142,7 @@ function SummaryPanel({ todayEntry, allEntries, isDarkMode }) {
       {/* Weekly Summary */}
       {allEntries.length > 0 && (
         <div className="summary-section weekly-summary">
-          <h3 className="section-title">📈 Weekly Summary</h3>
+          <h3 className="section-title">📈 {t ? t("weeklySummary") : "Weekly Summary"}</h3>
 
           <div className="weekly-grid">
             <div className="weekly-stat">

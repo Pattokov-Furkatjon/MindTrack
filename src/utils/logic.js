@@ -4,7 +4,13 @@
 /**
  * Create a new session object
  */
-export const createSession = (type, startTime, endTime) => {
+export const createSession = (
+  type,
+  startTime,
+  endTime,
+  mood = 5,
+  notes = ""
+) => {
   const [startHour, startMin] = startTime.split(":").map(Number);
   const [endHour, endMin] = endTime.split(":").map(Number);
 
@@ -25,6 +31,8 @@ export const createSession = (type, startTime, endTime) => {
     startTime,
     endTime,
     duration, // in hours (decimal)
+    mood: Math.min(Math.max(Number(mood), 1), 10),
+    notes,
     timestamp: Date.now(),
   };
 };
@@ -173,45 +181,59 @@ export const calculateWeeklyStats = (entries) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const weekEntries = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split("T")[0];
-    const entry = entries.find((e) => e.date === dateStr);
-    if (entry) weekEntries.push(entry);
-  }
-
-  if (weekEntries.length === 0) {
-    return {
-      weeklyTotal: 0,
-      weeklyStudy: 0,
-      weeklyExercise: 0,
-      weeklyWork: 0,
-      averageDaily: 0,
-      weekScore: 0,
-      bestDay: 0,
-      daysActive: 0,
-    };
-  }
-
+  const weekData = [];
   let totalTime = 0;
   let totalStudy = 0;
   let totalExercise = 0;
   let totalWork = 0;
+  let totalMood = 0;
+  let moodReadings = 0;
   let bestDay = 0;
+  let activeDays = 0;
 
-  weekEntries.forEach((entry) => {
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split("T")[0];
+
+    const entry = entries.find((e) => e.date === dateStr);
+    if (!entry) {
+      weekData.push({ date: dateStr, dayName: date.toLocaleDateString("en-US", { weekday: "short" }), totalTime: 0, moodAverage: 0 });
+      continue;
+    }
+
     const totals = calculateSessionTotals(entry.sessions);
+    const moods = entry.sessions.map((s) => Number(s.mood || 0));
+    const moodSum = moods.reduce((acc, m) => acc + m, 0);
+    const moodAvg = moods.length ? Math.round((moodSum / moods.length) * 10) / 10 : 0;
+
+    weekData.push({
+      date: dateStr,
+      dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
+      totalTime: totals.totalTime,
+      moodAverage: moodAvg,
+    });
+
     totalTime += totals.totalTime;
     totalStudy += totals.totalStudy;
     totalExercise += totals.totalExercise;
     totalWork += totals.totalWork;
-    bestDay = Math.max(bestDay, totals.totalTime);
-  });
 
-  const score = calculateProductivityScore(totalStudy, totalExercise, totalWork, weekEntries.length * 4);
+    if (totals.totalTime > 0) {
+      activeDays += 1;
+      bestDay = Math.max(bestDay, totals.totalTime);
+    }
 
+    if (moodAvg > 0) {
+      totalMood += moodAvg;
+      moodReadings += 1;
+    }
+  }
+
+  const score = calculateProductivityScore(totalStudy, totalExercise, totalWork, activeDays || 1);
+  const moodTrend = moodReadings ? Math.round((totalMood / moodReadings) * 10) / 10 : 0;
+
+  // if no activity return cleaned stats
   return {
     weeklyTotal: Math.round(totalTime * 100) / 100,
     weeklyStudy: Math.round(totalStudy * 100) / 100,
@@ -220,8 +242,39 @@ export const calculateWeeklyStats = (entries) => {
     averageDaily: Math.round((totalTime / 7) * 100) / 100,
     weekScore: score,
     bestDay: Math.round(bestDay * 100) / 100,
-    daysActive: weekEntries.length,
+    daysActive: activeDays,
+    averageMood: moodTrend,
+    lastSevenDays: weekData,
   };
+};
+
+export const generateWeeklyInsights = (entries) => {
+  const weeklyStats = calculateWeeklyStats(entries);
+  const mostProductiveDay = weeklyStats.lastSevenDays.reduce((acc, day) => {
+    if (!acc || day.totalTime > acc.totalTime) return day;
+    return acc;
+  }, null);
+
+  const moodImproving = weeklyStats.lastSevenDays.filter((d) => d.moodAverage > 0);
+
+  const insights = [];
+
+  if (mostProductiveDay && mostProductiveDay.totalTime > 0) {
+    insights.push(`You are most productive on ${new Date(mostProductiveDay.date).toLocaleDateString('en-US', { weekday: 'long' })}.`);
+  }
+
+  if (moodImproving.length >= 2 && moodImproving[moodImproving.length - 1].moodAverage > moodImproving[0].moodAverage) {
+    insights.push("Your mood is improving this week.");
+  } else {
+    insights.push("Keep tracking mood for clear trends.");
+  }
+
+  const score = weeklyStats.weekScore;
+  if (score >= 80) insights.push("Productivity is excellent. Keep up the momentum!");
+  else if (score >= 60) insights.push("Solid productivity, a little more focus to get great results.");
+  else insights.push("Try to consolidate your sessions for higher productivity.");
+
+  return insights;
 };
 
 /**

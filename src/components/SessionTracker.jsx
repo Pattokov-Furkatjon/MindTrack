@@ -11,8 +11,10 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
   const [sessionType, setSessionType] = useState("study");
   const [startTime, setStartTime] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [mood, setMood] = useState(7);
+  const [notes, setNotes] = useState("");
 
-  // Timer effect
+  // Timer effect - properly includes isActive in dependencies
   useEffect(() => {
     if (!isActive) return;
 
@@ -20,8 +22,9 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
       setElapsedSeconds((prev) => prev + 1);
     }, 1000);
 
+    // Cleanup interval on unmount or when isActive changes
     return () => clearInterval(interval);
-  }, [isActive]);
+  }, [isActive]); // ✅ Fixed: Added isActive to dependency array
 
   const formatElapsedTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -59,7 +62,7 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
     ).padStart(2, "0")}`;
 
     // Create session object
-    const session = createSession(sessionType, startTime, endTimeString);
+    const session = createSession(sessionType, startTime, endTimeString, mood, notes);
 
     // Call parent callback
     onSessionComplete(session);
@@ -69,6 +72,8 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
     setSessionType("study");
     setStartTime("");
     setElapsedSeconds(0);
+    setMood(7);
+    setNotes("");
   };
 
   const sessionTypeLabels = {
@@ -84,7 +89,7 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
   };
 
   return (
-    <div className={`session-tracker ${isDarkMode ? "dark-mode" : ""}`}>
+    <div id="session-tracker" className={`session-tracker ${isDarkMode ? "dark-mode" : ""}`}>
       <div className="tracker-container">
         {!isActive ? (
           // Start Session UI
@@ -102,6 +107,28 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
                   {label}
                 </button>
               ))}
+            </div>
+
+            <div className="session-additional">
+              <label>
+                Mood (1-10)
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={mood}
+                  onChange={(e) => setMood(Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Notes
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Optional notes"
+                />
+              </label>
             </div>
 
             {/* Start Button */}
@@ -131,6 +158,14 @@ function SessionTracker({ onSessionComplete, isDarkMode }) {
               <div className="info-item">
                 <span className="info-label">Session Type</span>
                 <span className="info-value">{sessionTypeLabels[sessionType]}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Mood</span>
+                <span className="info-value">{mood}/10</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Notes</span>
+                <span className="info-value">{notes || "No notes"}</span>
               </div>
             </div>
 

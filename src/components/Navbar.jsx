@@ -1,22 +1,18 @@
-import React from "react";
-import "../styles/navbar.css";
+﻿import React from 'react';
 
-/**
- * Navbar Component with Dark/Light Mode Toggle
- */
-function Navbar({ isDarkMode, toggleDarkMode }) {
+function Navbar({ theme, toggleTheme, locale, setLocale, t }) {
   return (
-    <nav className={`navbar ${isDarkMode ? "navbar-dark" : "navbar-light"}`}>
-      <h1 className="navbar-logo">🧠 MindTrack</h1>
-      <button
-        className="navbar-toggle"
-        onClick={toggleDarkMode}
-        aria-label="Toggle dark mode"
-        title={isDarkMode ? "Light Mode" : "Dark Mode"}
-      >
-        {isDarkMode ? "☀️" : "🌙"}
-      </button>
-    </nav>
+    <header className='navbar'>
+      <div className='brand'>
+        <span className='brand-title'>MindTrack</span>
+      </div>
+
+      <div className='navbar-actions'>
+        <button className='btn btn-ghost' onClick={toggleTheme}>
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+      </div>
+    </header>
   );
 }
 
