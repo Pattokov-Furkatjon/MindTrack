@@ -2,7 +2,7 @@
   "name": "ai",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://Pattokov-Furkatjon.github.io/MindTrack",
+  "homepage": "https://github.com/Pattokov-Furkatjon/MindTrack",
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
