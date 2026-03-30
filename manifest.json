@@ -1,0 +1,8 @@
+{
+  "short_name": "MindTrack",
+  "name": "MindTrack Productivity Dashboard",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#167a72",
+  "background_color": "#f5efe4"
+}

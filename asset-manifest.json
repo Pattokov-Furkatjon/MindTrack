@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MindTrack/static/css/main.779dc015.css",
+    "main.js": "/MindTrack/static/js/main.c8b06342.js",
+    "index.html": "/MindTrack/index.html",
+    "main.779dc015.css.map": "/MindTrack/static/css/main.779dc015.css.map",
+    "main.c8b06342.js.map": "/MindTrack/static/js/main.c8b06342.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.779dc015.css",
+    "static/js/main.c8b06342.js"
+  ]
+}
